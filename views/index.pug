@@ -1,0 +1,19 @@
+//
+   Created by jay on 4/23/17.
+
+html
+    head
+        title= title
+        body
+            p 'Welcome to the chat bot!
+
+            ol#messages
+
+            form#message-form
+                input(name="message", type="text", placeholder='Message')
+                button 'Send'
+
+            script(src="/socket.io/socket.io.js")
+            script(src="/js/libs/jquery-3.2.1.min.js")
+            script(src="/js/index.js")
+        footer
