@@ -11,10 +11,11 @@ const publicPath = path.join(__dirname, '../public');
 let app = express();
 app.use(express.static(publicPath));
 
-const {generateMessage, generateLocationMessage} = require('./utils/message');
+const {generateMessage, generateJadeLocation, generateJadeMessage} = require('./utils/message');
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, '../views'));
+
 app.use('public/js', express.static(path.join(__dirname, '/public/js')));
 app.use('public/css', express.static(path.join(__dirname, '/public/css')));
 
@@ -35,21 +36,19 @@ io.on('connection', (socket) => {
     console.log('New user connected');
 
     // Emits a new message when a user joins.. calls util function
-    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+    socket.emit('newMessage', generateJadeMessage('Admin', 'Welcome to the chat app'));
 
     // Broadcasts a message to other users than the one who joined
-    socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user has joined the channel'));
+    socket.broadcast.emit('newJadeMessage', generateJadeMessage('Admin', 'New user has joined the channel'));
 
     // Listens for when a user creates a message
     socket.on('createMessage', (message, callback) => {
-        console.log('createMessage', message);
-        io.emit('newMessage', generateMessage(message.from, message.text));
+        io.emit('newMessage', generateJadeMessage(message.user, message.text));
         callback();
     });
 
-
     socket.on('createLocationMessage', (coords) => {
-        io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
+        io.emit('newLocationMessage', generateJadeLocation('Admin', coords.latitude, coords.longitude));
     });
 
     socket.on('disconnect', () => {

@@ -1,26 +1,32 @@
 /**
  * Created by jay on 4/23/17.
  */
+const path = require('path');
+const viewsPath = path.join(__dirname, '../../views');
+const moment = require('moment');
+const pug = require('pug');
+const message = pug.compileFile(viewsPath + "/message.pug");
+const locationMessage = pug.compileFile(viewsPath + "/location_message.pug");
 
-// handles sending messages
 
-let moment = require('moment');
-
-
-let generateMessage = (from, text) => {
-    return {
-        from,
-        text,
-        createdAt: new Date().getTime()
-    }
+let generateJadeLocation = (user, latitude, longitude) => {
+    return locationMessage({
+        time: moment().format('h:mm a'),
+        user,
+        locationURL: `https://www.google.com/maps?q=${latitude},${longitude}`,
+    });
 };
 
-let generateLocationMessage = (from, latitude, longitude) => {
-    return {
-        from,
-        url: `https://www.google.com/maps?q=${latitude},${longitude}`,
-        createdAt: moment.valueOf()
-    }
+let generateJadeMessage = (user, text) => {
+
+    let time = moment().format('h:mm a');
+
+    return message({
+        time,
+        user,
+        text
+    });
+
 };
 
-module.exports = {generateMessage, generateLocationMessage};
+module.exports = {generateJadeLocation, generateJadeMessage};
