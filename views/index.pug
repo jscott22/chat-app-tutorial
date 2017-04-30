@@ -3,16 +3,24 @@
 
 html
     head
+        link(rel="stylesheet", href="css/course.css")
+        link(rel="stylesheet", href="css/main.css")
         title= title
-        body
-            p 'Welcome to the chat bot!
+        body.chat
 
-            ol#messages
+            div.chat__sidebar
+                h3 People
+                div#users
 
-            form#message-form
-                input(name="message", type="text", placeholder='Message')
-                button 'Send'
-            button#send-location 'Send Location'
+            div.chat__main
+
+                ol#messages.chat__messages
+
+                div.chat__footer
+                    form#message-form
+                        input(name="message", type="text", placeholder='Message', autofocus, autocomplete="off")
+                        button 'Send'
+                    button#send-location 'Send Location'
 
             script(src="/socket.io/socket.io.js")
             script(src="/js/libs/jquery-3.2.1.min.js")
