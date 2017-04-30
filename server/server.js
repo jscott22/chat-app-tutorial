@@ -12,6 +12,8 @@ let app = express();
 app.use(express.static(publicPath));
 
 const {generateMessage, generateJadeLocation, generateJadeMessage} = require('./utils/message');
+const {isRealString} = require('./utils/validation');
+const {Users} = require('./utils/Users');
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, '../views'));
@@ -22,6 +24,7 @@ app.use('public/css', express.static(path.join(__dirname, '/public/css')));
 let server = http.createServer(app);
 const port = process.env.PORT || 3000;
 let io = socketIO(server);
+let users = new Users();
 
 // Renders the index page
 app.get('/', (req, res) => {
@@ -38,13 +41,25 @@ app.get('/chat', (req, res) => {
 // Handles when a new user joins and when there is a connection
 io.on('connection', (socket) => {
 
-    console.log('New user connected');
+    socket.on('join', (params, callback) => {
 
-    // Emits a new message when a user joins.. calls util function
-    socket.emit('newMessage', generateJadeMessage('Admin', 'Welcome to the chat app'));
+        if(!isRealString(params.name) || !isRealString(params.room)) {
+            return callback('Name and room name are required.');
+        }
 
-    // Broadcasts a message to other users than the one who joined
-    socket.broadcast.emit('newJadeMessage', generateJadeMessage('Admin', 'New user has joined the channel'));
+        socket.join(params.room);
+        users.removeUser(socket.id);
+        users.addUser(socket.id, params.name, params.room);
+
+        io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+        socket.emit('newMessage', generateJadeMessage('Admin', 'Welcome to the chat app'));
+        socket.broadcast.to(params.room).emit('newMessage', generateJadeMessage('Admin', `${params.name} has joined the channel`));
+
+        callback();
+    });
+
+
+
 
     // Listens for when a user creates a message
     socket.on('createMessage', (message, callback) => {
@@ -57,7 +72,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log('Client disconnected');
+        var user = users.removeUser(socket.id);
+
+        if(user) {
+            io.to(user.room).emit('updateUserList', users.getUserList(user.room));
+            io.to(user.room).emit('newMessage', generateJadeMessage('Admin', `${user.name} has left`));
+        }
     });
 });
 
