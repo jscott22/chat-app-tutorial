@@ -1,0 +1,31 @@
+//
+   Created by jay on 4/23/17.
+doctype html
+html
+    head
+        meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
+        link(rel="stylesheet", href="css/course.css")
+        link(rel="stylesheet", href="css/main.css")
+        title= title
+        body.chat
+
+            div.chat__sidebar
+                h3 People
+                div#users
+
+            div.chat__main
+
+                ol#messages.chat__messages
+
+                div.chat__footer
+                    form#message-form
+                        input(name="message", type="text", placeholder=Message, autofocus, autocomplete="off")
+                        button Send
+                    button#send-location 'Send Location'
+
+
+            script(src="/socket.io/socket.io.js")
+            script(src="/js/libs/jquery-3.2.1.min.js")
+            script(src="/js/libs/moment.js")
+            script(src="/js/chat.js")
+        footer

@@ -29,6 +29,11 @@ app.get('/', (req, res) => {
         title: 'Chat Room App'
     })
 });
+app.get('/chat', (req, res) => {
+    res.render('chat', {
+
+    })
+});
 
 // Handles when a new user joins and when there is a connection
 io.on('connection', (socket) => {
