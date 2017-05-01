@@ -2,29 +2,48 @@
  * Created by jay on 4/23/17.
  */
 
+//SETS UP PATH
 const path = require('path');
-const http = require('http');
-const express = require('express');
-const socketIO = require('socket.io');
 const publicPath = path.join(__dirname, '../public');
 
+const http = require('http');
+
+//SETS UP EXPRESS APP
+const express = require('express');
 let app = express();
+
+//SETS UP PUBLIC FILES
 app.use(express.static(publicPath));
+app.use('public/js', express.static(path.join(__dirname, '/public/js')));
+app.use('public/css', express.static(path.join(__dirname, '/public/css')));
 
-const {generateMessage, generateJadeLocation, generateJadeMessage} = require('./utils/message');
-const {isRealString} = require('./utils/validation');
-const {Users} = require('./utils/Users');
-
+//HANDLES VIEW ENGINE
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, '../views'));
 
-app.use('public/js', express.static(path.join(__dirname, '/public/js')));
-app.use('public/css', express.static(path.join(__dirname, '/public/css')));
+
+const socketIO = require('socket.io');
+
+
+
+
+const {generateJadeLocation, generateJadeMessage} = require('./utils/message');
+const {isRealString} = require('./utils/validation');
+
+const {Bot} = require('./utils/bot');
+const {Users} = require('./utils/users');
+const {Rooms} = require('./utils/rooms');
+
+
+
+
 
 let server = http.createServer(app);
 const port = process.env.PORT || 3000;
 let io = socketIO(server);
+
 let users = new Users();
+let rooms = new Rooms();
 
 // Renders the index page
 app.get('/', (req, res) => {
@@ -47,7 +66,12 @@ io.on('connection', (socket) => {
             return callback('Name and room name are required.');
         }
 
+        if(rooms.roomsList.indexOf(params.room) < 0) {
+            rooms.addRoom(params.room);
+        }
+
         socket.join(params.room);
+
         users.removeUser(socket.id);
         users.addUser(socket.id, params.name, params.room);
 
@@ -64,7 +88,7 @@ io.on('connection', (socket) => {
     // Listens for when a user creates a message
     socket.on('createMessage', (message, callback) => {
 
-        var user = users.getUser(socket.id);
+        let user = users.getUser(socket.id);
 
         if (user && isRealString(message.text)) {
             io.to(user.room).emit('newMessage', generateJadeMessage(user.name, message.text));
@@ -83,12 +107,18 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
+
         var user = users.removeUser(socket.id);
+
+        if(io.sockets.adapter.rooms[user.room] === undefined) {
+         rooms.removeRoom(user.room);
+        }
 
         if(user) {
             io.to(user.room).emit('updateUserList', users.getUserList(user.room));
             io.to(user.room).emit('newMessage', generateJadeMessage('Admin', `${user.name} has left`));
         }
+
     });
 });
 
