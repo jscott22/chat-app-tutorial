@@ -63,12 +63,23 @@ io.on('connection', (socket) => {
 
     // Listens for when a user creates a message
     socket.on('createMessage', (message, callback) => {
-        io.emit('newMessage', generateJadeMessage(message.user, message.text));
+
+        var user = users.getUser(socket.id);
+
+        if (user && isRealString(message.text)) {
+            io.to(user.room).emit('newMessage', generateJadeMessage(user.name, message.text));
+        }
+
         callback();
     });
 
     socket.on('createLocationMessage', (coords) => {
-        io.emit('newLocationMessage', generateJadeLocation('Admin', coords.latitude, coords.longitude));
+
+        var user = users.getUser(socket.id);
+
+        if (user){
+            io.to(user.room).emit('newLocationMessage', generateJadeLocation(user.name, coords.latitude, coords.longitude));
+        }
     });
 
     socket.on('disconnect', () => {
