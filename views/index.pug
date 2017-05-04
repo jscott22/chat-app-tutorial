@@ -20,5 +20,11 @@ html
                     label Room name
                     input(type="text" name="room")
                 div.form-field
+                    label Room list
+                    select
+                        if roomsList != undefined && roomsList.length > 0
+                            each room in roomsList
+                                option= room
+                div.form-field
                     button Join
     footer

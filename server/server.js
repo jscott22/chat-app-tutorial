@@ -44,11 +44,13 @@ let io = socketIO(server);
 
 let users = new Users();
 let rooms = new Rooms();
+let bot = new Bot();
 
 // Renders the index page
 app.get('/', (req, res) => {
     res.render('index', {
-        title: 'Chat Room App'
+        title: 'Chat Room App',
+        roomsList: rooms.roomsList
     })
 });
 app.get('/chat', (req, res) => {
@@ -76,7 +78,9 @@ io.on('connection', (socket) => {
         users.addUser(socket.id, params.name, params.room);
 
         io.to(params.room).emit('updateUserList', users.getUserList(params.room));
-        socket.emit('newMessage', generateJadeMessage('Admin', 'Welcome to the chat app'));
+
+        socket.emit('newMessage', bot.greetUser(params.name));
+
         socket.broadcast.to(params.room).emit('newMessage', generateJadeMessage('Admin', `${params.name} has joined the channel`));
 
         callback();
@@ -91,6 +95,13 @@ io.on('connection', (socket) => {
         let user = users.getUser(socket.id);
 
         if (user && isRealString(message.text)) {
+
+            let botResponse = bot.checkResponse(message.text);
+
+            if(botResponse) {
+                io.to(user.room).emit('newMessage', botResponse);
+            }
+
             io.to(user.room).emit('newMessage', generateJadeMessage(user.name, message.text));
         }
 
