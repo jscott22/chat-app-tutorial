@@ -4,7 +4,6 @@ doctype html
 html
     head
         meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
-        link(rel="stylesheet", href="css/course.css")
         link(rel="stylesheet", href="css/main.css")
         title= title
         body.chat
@@ -21,7 +20,7 @@ html
                     form#message-form
                         input(name="message", type="text", placeholder=Message, autofocus, autocomplete="off")
                         button Send
-                    button#send-location 'Send Location'
+                    button#send-location Send Location
 
 
             script(src="/socket.io/socket.io.js")

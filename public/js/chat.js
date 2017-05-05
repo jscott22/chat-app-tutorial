@@ -45,19 +45,16 @@ socket.on('disconnect', function() {
 
 socket.on('updateUserList', function (users) {
 
-    var ol = $('<ol></ol>');
+    var ul = $('<ul></ul>');
+
+    ul.append($('<li></li>').text('Chatbot 3000'));
 
     users.forEach(function (user) {
-        ol.append($('<li></li>').text(user));
+        ul.append($('<li></li>').text(user));
     });
 
-    $('#users').html(ol);
+    $('#users').html(ul);
 
-});
-
-
-socket.on('updateUserList', function (users) {
-    console.log('Users list', users);
 });
 
 

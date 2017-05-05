@@ -21,11 +21,7 @@ app.use('public/css', express.static(path.join(__dirname, '/public/css')));
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, '../views'));
 
-
 const socketIO = require('socket.io');
-
-
-
 
 const {generateJadeLocation, generateJadeMessage} = require('./utils/message');
 const {isRealString} = require('./utils/validation');
@@ -33,10 +29,6 @@ const {isRealString} = require('./utils/validation');
 const {Bot} = require('./utils/bot');
 const {Users} = require('./utils/users');
 const {Rooms} = require('./utils/rooms');
-
-
-
-
 
 let server = http.createServer(app);
 const port = process.env.PORT || 3000;
@@ -86,9 +78,6 @@ io.on('connection', (socket) => {
         callback();
     });
 
-
-
-
     // Listens for when a user creates a message
     socket.on('createMessage', (message, callback) => {
 
@@ -99,7 +88,9 @@ io.on('connection', (socket) => {
             let botResponse = bot.checkResponse(message.text);
 
             if(botResponse) {
-                io.to(user.room).emit('newMessage', botResponse);
+                setTimeout(() => {
+                    io.to(user.room).emit('newMessage', botResponse);
+                }, 50);
             }
 
             io.to(user.room).emit('newMessage', generateJadeMessage(user.name, message.text));
@@ -121,9 +112,9 @@ io.on('connection', (socket) => {
 
         var user = users.removeUser(socket.id);
 
-        if(io.sockets.adapter.rooms[user.room] === undefined) {
-         rooms.removeRoom(user.room);
-        }
+        // if(io.sockets.adapter.rooms[user.room] === undefined) {
+        //  rooms.removeRoom(user.room);
+        // }
 
         if(user) {
             io.to(user.room).emit('updateUserList', users.getUserList(user.room));

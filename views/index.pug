@@ -6,7 +6,6 @@ html
         meta(charset='utf-8')
         title Join | Chat App
         meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
-        link(rel='stylesheet' href='css/course.css')
         link(rel='stylesheet' href='css/main.css')
     body.centered-form
         div.centered-form__form
@@ -19,12 +18,12 @@ html
                 div.form-field
                     label Room name
                     input(type="text" name="room")
-                div.form-field
-                    label Room list
-                    select
-                        if roomsList != undefined && roomsList.length > 0
-                            each room in roomsList
-                                option= room
+                //div.form-field
+                //    label Room list
+                //    select
+                //        if roomsList != undefined && roomsList.length > 0
+                //            each room in roomsList
+                //                option= room
                 div.form-field
                     button Join
     footer
