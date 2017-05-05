@@ -61,7 +61,9 @@ class Bot {
 
         if(message.toLowerCase().substr(0, 8) === "chatbot,") {
 
-            let response = this.speak(this.confusedList[Math.floor((Math.random() * this.confusedList.length) + 1)]);
+            let response = this.speak(this.confusedList[Math.floor((Math.random() * this.confusedList.length))]);
+
+            console.log(response);
 
             let questions = Object.keys(this.questionList);
 

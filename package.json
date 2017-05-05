@@ -21,8 +21,6 @@
   },
   "devDependencies": {
     "expect": "^1.20.2",
-    "gulp": "^3.9.1",
-    "gulp-sass": "^3.1.0",
     "mocha": "^3.3.0",
     "nodemon": "^1.11.0"
   }
